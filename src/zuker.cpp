@@ -76,10 +76,6 @@ void Zuker::calc_V(){
       if(j-i <= M){
         VM.at(i).at(j) = INF;
       }else if(!is_match(i, j)){
-        //not pair
-        //debug info を利用したい
-        cout << "[V]not pair calc?" <<  endl;
-        cout << i << " " << j << endl;
         VM.at(i).at(j) = INF;
       }else{
         double hairpin = eH(i, j);
