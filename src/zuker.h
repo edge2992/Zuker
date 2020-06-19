@@ -23,13 +23,14 @@ class Zuker{
     const double multi_a = 6.0;
     const double multi_b = -1.0;
     const double multi_c = 0.1;
+    vector<vector<bool>> VM_iscalced;
     void calc_V();
     void calc_W();
     double calc_VM(int i, int j);
     //hairpin loop
     double eH(int i, int j);
     //stacking loop
-    double eS(int i, int j);
+    double eS(int i, int j, int ii, int jj);
     //internal loop
     double eL(int i, int j, int ii, int jj);
     // base pair?

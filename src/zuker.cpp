@@ -12,6 +12,7 @@ Zuker::Zuker(string rna_seq)
   W = vector<vector<double>>(N+1, vector<double>(N+1, INF));
   V = vector<vector<double>>(N+1, vector<double>(N+1, INF));
   VM = vector<vector<double>>(N+1, vector<double>(N+1, INF));
+  VM_iscalced = vector<vector<bool>>(N+1, vector<bool>(N+1, false));
   /* calc_VM(); */
   calc_V();
   calc_W();
@@ -44,25 +45,32 @@ bool Zuker::is_match(int i, int j){
 
 double Zuker::calc_VM(int i, int j){
   //TODO 計算済みだったら値は変わらないはずなので、再度計算しない
-  if(j-i <= M){
-    return INF;
-  }else if(i<1 | i>N | j<1| j>N){
-    return INF;
+  if(VM_iscalced.at(i).at(j)){
+    return VM.at(i).at(j);
   }else{
-    double multi_seg = INF;
-    double j_unpair = calc_VM(i, j-1) + multi_c;
-    double i_unpair = calc_VM(i+1, j) + multi_c;
-    double non_closed = INF;
-    for(int k=i+1; k<j; k++){
-      non_closed = min(non_closed, calc_VM(i, k) + calc_VM(i+1, j));
-    }
-    if(is_match(i, j)){
-      multi_seg = min({j_unpair, i_unpair, non_closed, V.at(i).at(j) + multi_b});
+    if(j-i <= M){
+      VM_iscalced.at(i).at(j) = true;
+      return INF;
+    }else if(i<1 | i>N | j<1| j>N){
+      VM_iscalced.at(i).at(j) = true;
+      return INF;
     }else{
-      multi_seg = min({j_unpair, i_unpair, non_closed});
+      double multi_seg = INF;
+      double j_unpair = calc_VM(i, j-1) + multi_c;
+      double i_unpair = calc_VM(i+1, j) + multi_c;
+      double non_closed = INF;
+      for(int k=i+1; k<j; k++){
+        non_closed = min(non_closed, calc_VM(i, k) + calc_VM(i+1, j));
+      }
+      if(is_match(i, j)){
+        multi_seg = min({j_unpair, i_unpair, non_closed, V.at(i).at(j) + multi_b});
+      }else{
+        multi_seg = min({j_unpair, i_unpair, non_closed});
+      }
+      VM.at(i).at(j) = multi_seg;
+      VM_iscalced.at(i).at(j) = true;
+      return multi_seg;
     }
-    VM.at(i).at(j) = multi_seg;
-    return multi_seg;
   }
 }
 
@@ -82,7 +90,7 @@ void Zuker::calc_V(){
         // ii jjがペアであることを確認する
         double stacking = INF;
         if(is_match(i+1, j-1)){
-            stacking = V.at(i+1).at(j-1)+ eS(i, j);
+            stacking = V.at(i+1).at(j-1)+ eS(i, j, i+1, j-1);
         }
         //calc internal
         double internal = INF;
@@ -140,15 +148,30 @@ double Zuker::eH(int i, int j){
 }
 
 
-double Zuker::eS(int i, int j){
-  double internal[32] = {INF, INF,1.0,1.0,1.1,2.0,2.0,2.1,2.3,2.4,2.5,2.6,2.7,2.8,2.9,2.9,3.0,3.1,3.1,3.2,3.3,3.3,3.4,3.4,3.5,3.5,3.5,3.6,3.6,3.7,3.7,INF};
-  int h = j-i;
-  if(h<2){
-    return INF;
-  }else if(h>30){
-    return INF;
+double Zuker::eS(int i, int j, int ii, int jj){
+  //TODO pairの条件分岐が雑
+  int pair1 = seq.at(i-1) + seq.at(j-1);
+  int pair2 = seq.at(ii-1) + seq.at(jj-1);
+  if(pair1 == 'G' + 'C'){
+    if(pair2== 'G' + 'C'){
+      return -3.0;
+    }else if(pair2 == 'A' + 'U' | pair2== 'G' + 'U'){
+      return -2.0;
+    }else{
+      cout << "[eS] error " << endl;
+      return INF;
+    }
+  }else if(pair1 == 'A' + 'U' | pair1== 'G' + 'U'){
+    if(pair2== 'G' + 'C'){
+      return -2.0;
+    }else if(pair2 == 'A' + 'U' | pair2== 'G' + 'U'){
+      return -0.5;
+    }else{
+      cout << "[eS] error " << endl;
+      return INF;
+    }
   }else{
-    return internal[h];
+    return INF;
   }
 }
 
