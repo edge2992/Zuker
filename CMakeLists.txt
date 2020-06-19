@@ -6,4 +6,5 @@ add_subdirectory(test)
 
 enable_testing()
 add_test(NAME EnergyTest COMMAND Test_energy)
+add_test(NAME ZukerTest COMMAND Test_zuker)
 
