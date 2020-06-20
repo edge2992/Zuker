@@ -1,4 +1,3 @@
-#include <bits/stdc++.h>
 #include "zuker.h"
 
 using namespace std;
@@ -25,7 +24,7 @@ Zuker::Zuker(string rna_seq)
 
 
 Zuker::~Zuker(){
-  cout << "deconstract zuker" << endl;
+  spdlog::info("deconstract zuker");
 }
 
 
@@ -64,7 +63,7 @@ double Zuker::calc_VM(int i, int j){
 
 void Zuker::calc_V(){
   //calc VM shold be executed before calc V
-  cout << "calc_V" << endl;
+  spdlog::info("calc_V");
   for(int j=1;j<=N; j++){
     for(int i=j; i>0; i--){
       if(j-i <= M){
@@ -102,7 +101,7 @@ void Zuker::calc_V(){
 
 void Zuker::calc_W(){
   //calc V should be executed before calc W
-  cout << "calc_W" << endl;
+  spdlog::info("calc_W");
 
   for(int i=N;i>0; i--){
     for(int j=i; j<=N;j++){

@@ -1,6 +1,9 @@
 #ifndef RNA_SEQ_H
 #define RNA_SEQ_H
 #include<bits/stdc++.h>
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
+
 
 using namespace std;
 

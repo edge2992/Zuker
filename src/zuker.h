@@ -3,6 +3,8 @@
 #include "gtest/gtest_prod.h"
 #include <bits/stdc++.h>
 #include "rna_seq.h"
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
 
 using namespace std;
 
