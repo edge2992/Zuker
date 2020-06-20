@@ -11,7 +11,7 @@ add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 
 add_executable(Test_zuker test_zuker.cpp)
 
-target_link_libraries(Test_zuker zuker gtest gtest_main pthread)
+target_link_libraries(Test_zuker zuker rna gtest gtest_main pthread)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 target_compile_features(Test_zuker PUBLIC cxx_std_11)

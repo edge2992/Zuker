@@ -12,7 +12,7 @@ using ll = long long;
  * @param rna_seq RNA sequence
  */
 Zuker::Zuker(string rna_seq)
-  : seq(rna_seq), N(rna_seq.length())
+  : seq(Rna_seq(rna_seq)), N(rna_seq.length())
 {
   W = vector<vector<double>>(N+1, vector<double>(N+1, INF));
   V = vector<vector<double>>(N+1, vector<double>(N+1, INF));
@@ -26,25 +26,6 @@ Zuker::Zuker(string rna_seq)
 
 Zuker::~Zuker(){
   cout << "deconstract zuker" << endl;
-}
-
-
-bool Zuker::is_match(int i, int j){
-  map<char, char> augc{
-    {'A', 'U'},
-    {'U', 'A'},
-    {'G', 'C'},
-    {'C', 'G'},
-  };
-  if(i<1 | i>N | j<1| j>N){
-    return false;
-  }else if(augc.find(seq.at(i-1)) != augc.end() | augc.find(seq.at(j-1)) != augc.end() ){
-    return augc.at(seq.at(i-1)) == seq.at(j-1);
-  }else{
-  //TODO AUGC 以外だった時のエラー処理
-    cout << "not AUGC" << endl;
-    return false;
-  }
 }
 
 
@@ -67,7 +48,7 @@ double Zuker::calc_VM(int i, int j){
       for(int k=i+1; k<j; k++){
         non_closed = min(non_closed, calc_VM(i, k) + calc_VM(k+1, j));
       }
-      if(is_match(i, j)){
+      if(seq.is_WCpair(i, j)){
         multi_seg = min({j_unpair, i_unpair, non_closed, V.at(i).at(j) + multi_b});
       }else{
         multi_seg = min({j_unpair, i_unpair, non_closed});
@@ -88,21 +69,21 @@ void Zuker::calc_V(){
     for(int i=j; i>0; i--){
       if(j-i <= M){
         VM.at(i).at(j) = INF;
-      }else if(!is_match(i, j)){
+      }else if(!seq.is_WCpair(i, j)){
         VM.at(i).at(j) = INF;
       }else{
         double hairpin = eH(i, j);
         // ii jjがペアであることを確認する
         double stacking = INF;
         //TODO stacking 計算をnon-WC base pairについても適用する
-        if(is_match(i+1, j-1)){
+        if(seq.is_WCpair(i+1, j-1)){
             stacking = V.at(i+1).at(j-1)+ eS(i, j, i+1, j-1);
         }
         //calc internal
         double internal = INF;
         for(int ii=i+1; ii<j;ii++){
           for(int jj=ii+1; jj<j;jj++){
-            if(is_match(ii, jj)){
+            if(seq.is_WCpair(ii, jj)){
                 internal = min(internal, V.at(ii).at(jj)+eL(i, j, ii, jj));
             }
           }
@@ -130,7 +111,7 @@ void Zuker::calc_W(){
       }else{
         double buf = INF;
         for(int k=i;k<j;k++){
-          if(is_match(k, j)){
+          if(seq.is_WCpair(k, j)){
             buf= min(buf, W.at(i).at(k-1) + V.at(k).at(j));
           }
         }

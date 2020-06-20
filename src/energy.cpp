@@ -20,22 +20,19 @@ double Zuker::eH(int i, int j){
 
 
 double Zuker::eS(int i, int j, int ii, int jj){
-  //TODO pairの条件分岐が雑
-  int pair1 = seq.at(i-1) + seq.at(j-1);
-  int pair2 = seq.at(ii-1) + seq.at(jj-1);
-  if(pair1 == 'G' + 'C'){
-    if(pair2== 'G' + 'C'){
+  if(seq.is_GCpair(i, j)){
+    if(seq.is_GCpair(ii, jj)){
       return -3.0;
-    }else if(pair2 == 'A' + 'U' | pair2== 'G' + 'U'){
+    }else if(seq.is_AUpair(ii, jj) || seq.is_GUpair(ii, jj)){
       return -2.0;
     }else{
       cout << "[eS] error " << endl;
       return INF;
     }
-  }else if(pair1 == 'A' + 'U' | pair1== 'G' + 'U'){
-    if(pair2== 'G' + 'C'){
+  }else if(seq.is_AUpair(i, j) || seq.is_GUpair(i, j)){
+    if(seq.is_GCpair(ii, jj)){
       return -2.0;
-    }else if(pair2 == 'A' + 'U' | pair2== 'G' + 'U'){
+    }else if(seq.is_AUpair(ii, jj) || seq.is_GUpair(ii, jj)){
       return -0.5;
     }else{
       cout << "[eS] error " << endl;

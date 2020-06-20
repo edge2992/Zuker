@@ -2,6 +2,7 @@
 #define ZUKER_H
 #include "gtest/gtest_prod.h"
 #include <bits/stdc++.h>
+#include "rna_seq.h"
 
 using namespace std;
 
@@ -10,9 +11,10 @@ const double INF = 10000;
 
 class Zuker{
   public:
-    const string seq;
+    Rna_seq seq;
+    /* const string seq; */
     const int N;
-    string rna_2d;
+    string rna_2d; //二次構造
     vector<vector<double>> W;
     vector<vector<double>> V;
     vector<vector<double>> VM;
@@ -36,7 +38,7 @@ class Zuker{
     //internal loop
     double eL(int i, int j, int ii, int jj);
     // base pair?
-    bool is_match(int i, int j);
+    /* bool is_match(int i, int j); */
     int V_traceback(int i, int j);
     int VM_traceback(int i, int j);
 };

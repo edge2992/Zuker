@@ -24,7 +24,7 @@ string Zuker::W_traceback(){
       st.push(make_pair(i, j-1));
     }else{
       for(int k=i;k<j;k++){
-        if(is_match(k, j)){
+        if(seq.is_WCpair(k, j)){
           if(W.at(i).at(j) == W.at(i).at(k-1) + V.at(k).at(j)){
             rna_2d = find_pair(rna_2d, k, j);
             /* rna_2d.at(k) = '('; */
@@ -55,7 +55,7 @@ int Zuker::V_traceback(int i, int j){
   }else{
     for(int ii=i+1; ii<j;ii++){
       for(int jj=ii+1; jj<j;jj++){
-        if(is_match(ii, jj)){
+        if(seq.is_GCpair(ii, jj)){
           if(V.at(i).at(j) == V.at(ii).at(jj)+eL(i, j, ii, jj)){
             cout << i << " " << j << " " << ii << " " << jj<< " eL" << endl;
             rna_2d = find_pair(rna_2d, ii, jj);
