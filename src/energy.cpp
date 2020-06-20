@@ -25,7 +25,6 @@ double Zuker::eS(int i, int j, int ii, int jj){
     }else if(seq.is_AUpair(ii, jj) || seq.is_GUpair(ii, jj)){
       return -2.0;
     }else{
-      spdlog::warn("eS this is not pair {0} {1}", i, j);
       return INF;
     }
   }else if(seq.is_AUpair(i, j) || seq.is_GUpair(i, j)){
@@ -34,7 +33,6 @@ double Zuker::eS(int i, int j, int ii, int jj){
     }else if(seq.is_AUpair(ii, jj) || seq.is_GUpair(ii, jj)){
       return -0.5;
     }else{
-      spdlog::warn("eS this is not pair {0} {1}", i, j);
       return INF;
     }
   }else{

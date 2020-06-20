@@ -17,7 +17,6 @@ Zuker::Zuker(string rna_seq)
   V = vector<vector<double>>(N+1, vector<double>(N+1, INF));
   VM = vector<vector<double>>(N+1, vector<double>(N+1, INF));
   VM_iscalced = vector<vector<bool>>(N+1, vector<bool>(N+1, false));
-  /* calc_VM(); */
   calc_V();
   calc_W();
 }
@@ -28,8 +27,15 @@ Zuker::~Zuker(){
 }
 
 
+/**
+ * @brief multi loop energy calculator
+ *
+ * @param i
+ * @param j
+ *
+ * @return energy of i-j segment
+ */
 double Zuker::calc_VM(int i, int j){
-  //TODO 計算済みだったら値は変わらないはずなので、再度計算しない
   if(VM_iscalced.at(i).at(j)){
     return VM.at(i).at(j);
   }else{
@@ -61,6 +67,9 @@ double Zuker::calc_VM(int i, int j){
 
 
 
+/**
+ * @brief V calculator by using DP
+ */
 void Zuker::calc_V(){
   //calc VM shold be executed before calc V
   spdlog::info("calc_V");
@@ -72,12 +81,7 @@ void Zuker::calc_V(){
         VM.at(i).at(j) = INF;
       }else{
         double hairpin = eH(i, j);
-        // ii jjがペアであることを確認する
-        double stacking = INF;
-        //TODO stacking 計算をnon-WC base pairについても適用する
-        if(seq.is_WCpair(i+1, j-1)){
-            stacking = V.at(i+1).at(j-1)+ eS(i, j, i+1, j-1);
-        }
+        double stacking = stacking = V.at(i+1).at(j-1)+ eS(i, j, i+1, j-1);
         //calc internal
         double internal = INF;
         for(int ii=i+1; ii<j;ii++){
@@ -87,7 +91,7 @@ void Zuker::calc_V(){
             }
           }
         }
-        //calc multi
+        //calc multi loop
         double multi = INF;
         for(int k=i+1; k<j; k++){
           multi = min(multi, calc_VM(i+1, k) + calc_VM(k+1, j-1) + multi_a);
@@ -99,6 +103,9 @@ void Zuker::calc_V(){
 }
 
 
+/**
+ * @brief calcurate V by using DP
+ */
 void Zuker::calc_W(){
   //calc V should be executed before calc W
   spdlog::info("calc_W");
