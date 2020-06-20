@@ -21,8 +21,7 @@ output
 ```
 ..((((((((((.....)))........))))).))...(((((((((.......))))..)).))).
 ```
-![trna](https://github.com/kaz-i-54/Zuker/tree/master/result/trna.png)
-
+![trna](https://github.com/kaz-i-54/Zuker/blob/master/result/trna.png?raw=true)
 ## cmakeとgtestを勉強した(備忘録)
 
 * [cmakeでgoogletestできる環境を作ってみる][https://www.jonki.net/entry/2016/06/15/220029]
