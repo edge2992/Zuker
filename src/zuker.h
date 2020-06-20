@@ -12,14 +12,16 @@ class Zuker{
   public:
     const string seq;
     const int N;
+    string rna_2d;
     vector<vector<double>> W;
     vector<vector<double>> V;
     vector<vector<double>> VM;
     Zuker(string seq);
     ~Zuker();
+    string W_traceback();
   private:
     FRIEND_TEST(ZukerTest, EnergyTest);
-    const int M = 4; //loopの最小値
+    const int M = 3; //loopの最小値
     const double multi_a = 6.0;
     const double multi_b = -1.0;
     const double multi_c = 0.1;
@@ -35,6 +37,8 @@ class Zuker{
     double eL(int i, int j, int ii, int jj);
     // base pair?
     bool is_match(int i, int j);
+    int V_traceback(int i, int j);
+    int VM_traceback(int i, int j);
 };
 
 

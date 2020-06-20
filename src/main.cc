@@ -25,6 +25,7 @@ int main()
   print_all(zuker.V);
   cout << "zuker w" << endl;
   print_all(zuker.W);
+  cout << zuker.W_traceback() << endl;
 
 
   return 0;
