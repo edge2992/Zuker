@@ -30,3 +30,5 @@ ctestができるとこまで
 * [(続) Google Testを導入してみた][https://qiita.com/y-vectorfield/items/f69464ee5d8cd80153bd]
 gtestを外部プロジェクトとしてダウンロードする（DownloadProjectを使用）
 
+https://rna.urmc.rochester.edu/NNDB/turner04/gu.html
+>Note also that the motif 5'GG/3'UU is assigned a ∆G°37 of –0.5 kcal/mol to optimize structure prediction accurracy, whereas it is measured as +0.5 kcal/mol
