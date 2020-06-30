@@ -17,12 +17,12 @@ class Zuker{
     /* const string seq; */
     const int N;
     string rna_2d; //二次構造
+    vector<double> F;
     vector<vector<double>> W;
     vector<vector<double>> V;
-    vector<vector<double>> VM;
+    vector<vector<double>> VBI;
     Zuker(string seq);
     ~Zuker();
-    string W_traceback();
   private:
     FRIEND_TEST(ZukerTest, EnergyTest);
     const int M = 3; //loopの最小値
@@ -30,9 +30,10 @@ class Zuker{
     const double multi_b = -1.0;
     const double multi_c = 0.1;
     vector<vector<bool>> VM_iscalced;
-    void calc_V();
-    void calc_W();
-    double calc_VM(int i, int j);
+    void calc_F(int j);
+    void calc_W(int i, int j);
+    void calc_V(int i, int j);
+    void calc_VBI(int i, int j);
     //hairpin loop
     double eH(int i, int j);
     //stacking loop
@@ -41,8 +42,11 @@ class Zuker{
     double eL(int i, int j, int ii, int jj);
     // base pair?
     /* bool is_match(int i, int j); */
-    int V_traceback(int i, int j);
-    int VM_traceback(int i, int j);
+    // rna_2dに計算した二次構造をいれる
+    bool F_traceback(int j);
+    bool W_traceback(int i, int j);
+    bool V_traceback(int i, int j);
+    bool VBI_traceback(int i, int j);
 };
 
 

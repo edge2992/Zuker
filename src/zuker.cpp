@@ -15,15 +15,41 @@ Zuker::Zuker(string rna_seq)
 {
   W = vector<vector<double>>(N+1, vector<double>(N+1, INF));
   V = vector<vector<double>>(N+1, vector<double>(N+1, INF));
-  VM = vector<vector<double>>(N+1, vector<double>(N+1, INF));
+  VBI = vector<vector<double>>(N+1, vector<double>(N+1, INF));
+  F = vecetor<double>(N+1, INF);
   VM_iscalced = vector<vector<bool>>(N+1, vector<bool>(N+1, false));
-  calc_V();
-  calc_W();
+  for(int k=0; k<N; k++){
+    for(int i= 1; i<=N; i++){
+      //対角線上に左上から右下に計算
+      int j = i+k;
+      calc_VBI(i, j);
+      calc_V(i, j);
+      calc_W(i, j);
+    }
+  }
+  for(int j = 1; j<=N; j++){
+    //1-jまでの断片行列の自由エネルギーを計算する
+    calc_F(j);
+  }
 }
 
 
 Zuker::~Zuker(){
   spdlog::info("deconstract zuker");
+}
+
+double Zuker::calc_VBI(int i, int j){
+  //内部ループとバルジループを計算する
+  double internal = INF;
+  for(int ii=i+1; ii<j;ii++){
+    for(int jj=ii+1; jj<j;jj++){
+      if(ii - i + j - jj > 2 and seq.is_WCpair(ii, jj)){
+          internal = min(internal, V.at(ii).at(jj)+eL(i, j, ii, jj));
+      }
+    }
+  }
+  VBI.at(i).at(j) = internal;
+  return internal;
 }
 
 
@@ -70,35 +96,24 @@ double Zuker::calc_VM(int i, int j){
 /**
  * @brief V calculator by using DP
  */
-void Zuker::calc_V(){
+void Zuker::calc_V(int i, int j){
   //calc VM shold be executed before calc V
   spdlog::info("calc_V");
-  for(int j=1;j<=N; j++){
-    for(int i=j; i>0; i--){
-      if(j-i <= M){
-        VM.at(i).at(j) = INF;
-      }else if(!seq.is_WCpair(i, j)){
-        VM.at(i).at(j) = INF;
-      }else{
-        double hairpin = eH(i, j);
-        double stacking = stacking = V.at(i+1).at(j-1)+ eS(i, j, i+1, j-1);
-        //calc internal
-        double internal = INF;
-        for(int ii=i+1; ii<j;ii++){
-          for(int jj=ii+1; jj<j;jj++){
-            if(seq.is_WCpair(ii, jj)){
-                internal = min(internal, V.at(ii).at(jj)+eL(i, j, ii, jj));
-            }
-          }
-        }
-        //calc multi loop
-        double multi = INF;
-        for(int k=i+1; k<j; k++){
-          multi = min(multi, calc_VM(i+1, k) + calc_VM(k+1, j-1) + multi_a);
-        }
-        V.at(i).at(j) = min({hairpin, stacking, internal, multi});
-      }
+  if(j-i <= M){
+    VM.at(i).at(j) = INF;
+  }else if(!seq.is_WCpair(i, j)){
+    spdlog::error(" V this is not base pair {0} {1}", i, j);
+    VM.at(i).at(j) = INF;
+  }else{
+    //計算する
+    double hairpin = eH(i, j);
+    double stacking = stacking = V.at(i+1).at(j-1)+ eS(i, j, i+1, j-1);
+    double multi = INF;
+    for(int k=i+1; k<j-1; k++){
+      //TODO ここから
+      multi = min(multi, calc_VM(i+1, k) + calc_VM(k+1, j-1) + multi_a);
     }
+    V.at(i).at(j) = min({hairpin, stacking, internal, multi});
   }
 }
 
