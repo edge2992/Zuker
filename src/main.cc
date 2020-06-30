@@ -37,8 +37,9 @@ int main()
   /* std::cin >> rna_seq; */
   for(string seq : rna_seq){
     Zuker zuker(seq);
-    print_all(zuker.VM);
-    cout << zuker.W_traceback() << endl;
+    print_all(zuker.W);
+    zuker.F_traceback();
+    cout << zuker.rna_2d << endl;
   }
 
 

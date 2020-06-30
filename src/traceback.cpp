@@ -6,140 +6,134 @@ string find_pair(string rna, int i, int j){
   return rna;
 }
 
-
-string Zuker::W_traceback(){
+bool Zuker::F_traceback(){
   spdlog::info("traceback");
-  stack<pair<int, int>> st;
-  rna_2d = string(N, '.');
-  st.push(make_pair(1,N));
+  stack<int> st;
+  st.push(N);
 
   for(; !st.empty();){
-    pair<int, int> buf = st.top();
+    int j = st.top();
     st.pop();
-    int i = buf.first, j = buf.second;
+    /* spdlog::info(j); */
+    if(j<1){
+      spdlog::info("traceback fin");
+      break;
+    }
 
-    if(i>=j){
-
-    }else if(W.at(i+1).at(j) == W.at(i).at(j)){
-      st.push(make_pair(i+1, j));
-          spdlog::info("new bunki");
-    }else if(W.at(i).at(j-1) == W.at(i).at(j)){
-      st.push(make_pair(i, j-1));
-    /* }else if(W.at(i+1).at(j) == W.at(i).at(j)){ */
-    /*   st.push(make_pair(i+1, j)); */
-    /*       spdlog::info("new bunki"); */
+    if(F.at(j) == F.at(j-1)){
+      //不安　V.at(i).at(j) = 0の場合
+      st.push(j-1);
     }else{
-      bool check = false;
       int counter = 0;
-      for(int k=i;k<j;k++){
-        if(seq.is_WCpair(k, j)){
-          if(W.at(i).at(j) == W.at(i).at(k-1) + V.at(k).at(j)){
-            /* rna_2d = find_pair(rna_2d, k, j); */
-            /* st.push(make_pair(i, k-1)); */
-            //hontoha push koko
-            if(V_traceback(k, j) == 0){
-              rna_2d = find_pair(rna_2d, k, j);
-              st.push(make_pair(i, k-1));
-              check = true;
-              // errorなく終わるならOK
-              //一つ良さげな塩基対を見つけたらそれでいいのだろうか
-              counter += 1;
-              /* break; */
-
+      for(int i=1;i<j;i++){
+        if(seq.is_WCpair(i, j)){
+          if(F.at(j) == F.at(i-1) + V.at(i).at(j)){
+            counter += 1;
+            if(V_traceback(i, j)){
+              rna_2d = find_pair(rna_2d, i, j);
+              st.push(i-1);
             }else{
-              /* st.push(make_pair(i, j)); */
+              spdlog::error("F_traceback (1)");
             }
           }
         }
       }
-      spdlog::info(counter);
-      if(!check){
-        /* st.push(make_pair(i, j)); */
-        spdlog::error("W_error");
+      //error check
+      if(counter!=1){
+        spdlog::error("F error {0}", counter);
       }
     }
   }
-  return rna_2d;
+  return true;
 }
 
 
-int Zuker::V_traceback(int i, int j){
+bool Zuker::V_traceback(int i, int j){
+  if(!seq.is_WCpair(i, j)){
+    spdlog::error("V_traceback error {0} {1} is not pair", i, j);
+    return false;
+  }
+
   if(V.at(i).at(j) == eH(i, j)){
     //hairpin loop
-    return 0;
-  }else if(V.at(i).at(j) == V.at(i+1).at(j-1) + eS(i, j, i+1, j-1) and V_traceback(i+1, j-1) == 0){
+    return true;
+  }else if(seq.is_WCpair(i+1, j-1) and V.at(i).at(j) == V.at(i+1).at(j-1) + eS(i, j, i+1, j-1) and V_traceback(i+1, j-1)){
     //stacking
-    /* rna_2d = find_pair(rna_2d, i+1, j-1); */
-    /* if(V_traceback(i+1, j-1) == 0){ */
+    //TODO ここでエラーしてる
     rna_2d = find_pair(rna_2d, i+1, j-1);
-              // errorなく終わるならOK
-      return 0;
-    /* }else{ */
-    /*   spdlog::error("whakatta"); */
-    /* } */
+    return true;
+  }else if(V.at(i).at(j) == VBI.at(i).at(j)){
+    //internal and buldge loop
+    return VBI_traceback(i, j);
   }else{
-    spdlog::info("hahah");
-    //internal or buldge loop?
-    for(int ii=i+1; ii<j;ii++){
-      for(int jj=ii+1; jj<j;jj++){
-        if(seq.is_GCpair(ii, jj)){
-          if(V.at(i).at(j) == V.at(ii).at(jj)+eL(i, j, ii, jj)){
-            if(V_traceback(ii, jj) == 0){
-              rna_2d = find_pair(rna_2d, ii, jj);
-              return 0;
-            }
+    for(int k=i+1; k<j-1; k++){
+      if(V.at(i).at(j) == W.at(i+1).at(k) + W.at(k+1).at(j-1) + multi_a){
+        return W_traceback(i+1, k) and W_traceback(k+1, j-1);
+      }
+    }
+  }
+  spdlog::error("V_traceback error");
+  return false;
+}
+
+
+bool Zuker::W_traceback(int i, int j){
+  spdlog::info("W_traceback");
+  double multi_seg = INF;
+  if(W.at(i).at(j) == W.at(i).at(j-1) + multi_c){
+    if(W_traceback(i, j-1)){
+        return true;
+    }else{
+      spdlog::error("W error 1");
+    }
+    /* return W_traceback(i, j-1); */
+  }else if(W.at(i).at(j) == W.at(i+1).at(j) + multi_c){
+    if(W_traceback(i+1, j)){
+      return true;
+    }else{
+      spdlog::error("W error 2");
+    }
+  }else if(seq.is_WCpair(i, j) and W.at(i).at(j) == V.at(i).at(j) + multi_b){
+    if(V_traceback(i, j)){
+      rna_2d = find_pair(rna_2d, i, j);
+      return true;
+    }else{
+      spdlog::error("W error 3");
+    }
+  }else{
+    for(int k=i+1; k<j; k++){
+      if(W.at(i).at(j) == W.at(i).at(k) + W.at(k+1).at(j)){
+        if(W_traceback(i, k) and W_traceback(k+1, j)){
+            return true;
+        }else{
+          spdlog::error("W error 4"); 
+        }
+      }
+    }
+  }
+  spdlog::error("W_traceback was something wrong.");
+  return false;
+}
+
+
+bool Zuker::VBI_traceback(int i, int j){
+  //internal or buldge loop?
+  /* spdlog::info("VBI_traceback"); */
+  for(int ii=i+1; ii<j;ii++){
+    for(int jj=ii+1; jj<j;jj++){
+      if(seq.is_WCpair(ii, jj)){
+        if(V.at(i).at(j) == V.at(ii).at(jj)+eL(i, j, ii, jj)){
+          if(V_traceback(ii, jj)){
+            rna_2d = find_pair(rna_2d, ii, jj);
+            return true;
+          }else{
+            spdlog::error("vbi error 1");
           }
         }
       }
     }
-    //multi loop?
-    double multi = INF;
-    for(int k=i+1; k<j; k++){
-      if(V.at(i).at(j) ==  calc_VM(i+1, k) + calc_VM(k+1, j-1) + multi_a){
-        spdlog::info("oh this is multi loop");
-        VM_traceback(i+1, k);
-        VM_traceback(k+1, j-1);
-        return 0;
-      }
-    }
   }
-  spdlog::error("V_traceback was something wrong!!{0} {1}", i, j);
-  return 1;
+  spdlog::error("VBI_traceback error");
+  return false;
 }
 
-int Zuker::VM_traceback(int i, int j){
-  spdlog::info("VM_traceback");
-  if(j-i <= M){
-    return 0;
-  }else if(i<1 | i>N | j<1| j>N){
-    spdlog::error("VM_traceback was something wrong. sequence out of range error");
-    return 1;
-  }else{
-    double multi_seg = INF;
-    if(VM.at(i).at(j) == VM.at(i).at(j-1) + multi_c){
-      VM_traceback(i, j-1);
-      return 0;
-    }else if(VM.at(i).at(j) == VM.at(i+1).at(j) + multi_c){
-      VM_traceback(i+1, j);
-      return 0;
-    }else if(VM.at(i).at(j) == V.at(i).at(j) + multi_b){
-      rna_2d = find_pair(rna_2d, i, j);
-      spdlog::error("in VM find V");
-      V_traceback(i, j);
-      // loopしてしまう？　ここについては調べる必要がない？
-      return 0;
-    }else{
-      double non_closed = INF;
-      for(int k=i+1; k<j; k++){
-        if(VM.at(i).at(j) == calc_VM(i, k) + calc_VM(k+1, j)){
-          VM_traceback(i, k);
-          VM_traceback(k+1, j);
-          return 0;
-          break;
-        }
-      }
-    }
-  }
-  spdlog::error("VM_traceback was something wrong.");
-  return 1;
-}

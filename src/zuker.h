@@ -21,6 +21,7 @@ class Zuker{
     vector<vector<double>> W;
     vector<vector<double>> V;
     vector<vector<double>> VBI;
+    bool F_traceback();
     Zuker(string seq);
     ~Zuker();
   private:
@@ -42,8 +43,6 @@ class Zuker{
     double eL(int i, int j, int ii, int jj);
     // base pair?
     /* bool is_match(int i, int j); */
-    // rna_2dに計算した二次構造をいれる
-    bool F_traceback(int j);
     bool W_traceback(int i, int j);
     bool V_traceback(int i, int j);
     bool VBI_traceback(int i, int j);
