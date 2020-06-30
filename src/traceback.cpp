@@ -20,18 +20,42 @@ string Zuker::W_traceback(){
 
     if(i>=j){
 
+    }else if(W.at(i+1).at(j) == W.at(i).at(j)){
+      st.push(make_pair(i+1, j));
+          spdlog::info("new bunki");
     }else if(W.at(i).at(j-1) == W.at(i).at(j)){
       st.push(make_pair(i, j-1));
+    /* }else if(W.at(i+1).at(j) == W.at(i).at(j)){ */
+    /*   st.push(make_pair(i+1, j)); */
+    /*       spdlog::info("new bunki"); */
     }else{
+      bool check = false;
+      int counter = 0;
       for(int k=i;k<j;k++){
         if(seq.is_WCpair(k, j)){
           if(W.at(i).at(j) == W.at(i).at(k-1) + V.at(k).at(j)){
-            rna_2d = find_pair(rna_2d, k, j);
-            st.push(make_pair(i, k-1));
-            V_traceback(k, j);
-            break;
+            /* rna_2d = find_pair(rna_2d, k, j); */
+            /* st.push(make_pair(i, k-1)); */
+            //hontoha push koko
+            if(V_traceback(k, j) == 0){
+              rna_2d = find_pair(rna_2d, k, j);
+              st.push(make_pair(i, k-1));
+              check = true;
+              // errorなく終わるならOK
+              //一つ良さげな塩基対を見つけたらそれでいいのだろうか
+              counter += 1;
+              /* break; */
+
+            }else{
+              /* st.push(make_pair(i, j)); */
+            }
           }
         }
+      }
+      spdlog::info(counter);
+      if(!check){
+        /* st.push(make_pair(i, j)); */
+        spdlog::error("W_error");
       }
     }
   }
@@ -43,20 +67,27 @@ int Zuker::V_traceback(int i, int j){
   if(V.at(i).at(j) == eH(i, j)){
     //hairpin loop
     return 0;
-  }else if(V.at(i).at(j) == V.at(i+1).at(j-1) + eS(i, j, i+1, j-1)){
+  }else if(V.at(i).at(j) == V.at(i+1).at(j-1) + eS(i, j, i+1, j-1) and V_traceback(i+1, j-1) == 0){
     //stacking
+    /* rna_2d = find_pair(rna_2d, i+1, j-1); */
+    /* if(V_traceback(i+1, j-1) == 0){ */
     rna_2d = find_pair(rna_2d, i+1, j-1);
-    V_traceback(i+1, j-1);
-    return 0;
+              // errorなく終わるならOK
+      return 0;
+    /* }else{ */
+    /*   spdlog::error("whakatta"); */
+    /* } */
   }else{
+    spdlog::info("hahah");
     //internal or buldge loop?
     for(int ii=i+1; ii<j;ii++){
       for(int jj=ii+1; jj<j;jj++){
         if(seq.is_GCpair(ii, jj)){
           if(V.at(i).at(j) == V.at(ii).at(jj)+eL(i, j, ii, jj)){
-            rna_2d = find_pair(rna_2d, ii, jj);
-            V_traceback(ii, jj);
-            return 0;
+            if(V_traceback(ii, jj) == 0){
+              rna_2d = find_pair(rna_2d, ii, jj);
+              return 0;
+            }
           }
         }
       }
@@ -72,7 +103,7 @@ int Zuker::V_traceback(int i, int j){
       }
     }
   }
-  spdlog::error("V_traceback was something wrong!!");
+  spdlog::error("V_traceback was something wrong!!{0} {1}", i, j);
   return 1;
 }
 
@@ -93,7 +124,8 @@ int Zuker::VM_traceback(int i, int j){
       return 0;
     }else if(VM.at(i).at(j) == V.at(i).at(j) + multi_b){
       rna_2d = find_pair(rna_2d, i, j);
-      /* V_traceback(i, j); */
+      spdlog::error("in VM find V");
+      V_traceback(i, j);
       // loopしてしまう？　ここについては調べる必要がない？
       return 0;
     }else{

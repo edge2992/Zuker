@@ -29,14 +29,33 @@ int main()
 {
   spdlog::info("Zuker algorithm");
   spdlog::info("please enter rna sequence (augc sequence)");
-  string rna_seq;
-  std::cin >> rna_seq;
-  Zuker zuker(rna_seq);
-  print_all(zuker.VM);
-  /* print_all(zuker.V); */
-  /* cout << "zuker w" << endl; */
-  /* print_all(zuker.W); */
-  cout << zuker.W_traceback() << endl;
+  list<string> rna_seq;
+  rna_seq.push_back("GGGCCCAUAGCUCAGUGGUAGAGUGCCUCCUUUGCAAGGAGGAUGCCCUGGGUUCGAAUCCCAGUGGGUCCA");
+  rna_seq.push_back("UGUGGUGUAGUGGUUAUCACGUUUGCCUUACACGCAAAAGGUCUCCAGUUCGAUCCUGGGCAGCACCA");
+  rna_seq.push_back("GGUGCUGUGGUGUAGUGGUUAUCACGUUUGCCUUACACGCAAAAGGUCUCCAGUUCGAUCCUGGGCAGCACCA");
+  rna_seq.push_back("CUCUGGUAACUAGAGAUCCCUCAGACCCUUUUAGUCAGUGUGGAAAAUCUCUAGCAGUGGCGCCCGAACAGGGACUUGAAAGCGAAAGGGAAACCAGAG");
+  /* std::cin >> rna_seq; */
+  for(string seq : rna_seq){
+    Zuker zuker(seq);
+    print_all(zuker.VM);
+    cout << zuker.W_traceback() << endl;
+  }
+
+
+  /* Zuker zuker(rna_seq); */
+  /* print_all(zuker.VM); */
+  /* cout << zuker.W_traceback() << endl; */
+
+  /* spdlog::info("Zuker algorithm"); */
+  /* string rna_se = "UGUGGUGUAGUGGUUAUCACGUUUGCCUUACACGCAAAAGGUCUCCAGUUCGAUCCUGGGCAGCACCA"; */
+  /* /1* zuker.~Zuker(); *1/ */
+  /* Zuker zuke(rna_se); */
+  /* print_all(zuke.VM); */
+  /* /1* print_all(zuker.V); *1/ */
+  /* /1* cout << "zuker w" << endl; *1/ */
+  /* /1* print_all(zuker.W); *1/ */
+  /* cout << zuke.W_traceback() << endl; */
+
 
 
   return 0;
